@@ -2,7 +2,7 @@
  Deploy AWS EC2 host using Iac with Terraform
 
 
-        ![Alt text](pipeline_image.png)
+        ![Alt text](image.jpg)
 
 ```
 # run
