@@ -5,11 +5,10 @@ variable "region" {
 }
 
 variable "amazon_amis" {
-  type = "map"
-
+  type = map(string)
   default = {
     #ecs amis
-    eu-west-1 = "ami-0493936afbe820b28"
+    eu-west-3 = "ami-0493936afbe820b28"
   }
 }
 
@@ -18,7 +17,7 @@ variable "instance_type" {
 }
 
 variable "availability_zone" {
-  type = "map"
+  type = map(string)
 
   default = {
     primary = "eu-west-3a"

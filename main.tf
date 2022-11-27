@@ -11,7 +11,7 @@ terraform {
 }
 
 provider "aws" {
-  region = "${var.region}"
+  region = var.region
 }
 
 #########################################################
@@ -20,8 +20,8 @@ provider "aws" {
 
 ################ EC2 #######################
 resource "aws_instance" "myec2" {
-  ami           = "${var.amazon_amis}"
-  instance_type = "${var.instance_type}"
+  ami           = var.amazon_amis.eu-west-3
+  instance_type = var.instance_type
 
   tags = {
     Name = "myec2_server"
@@ -30,57 +30,56 @@ resource "aws_instance" "myec2" {
   root_block_device {
     delete_on_termination = true
   }
- }
+}
 
 ################### cluseter ##############################
 resource "aws_ecs_cluster" "ecs-cluster" {
-  name = "${var.ecs_cluster_name}"
+  name = var.ecs_cluster_name
 }
 
 ##################### VPC #################################
 resource "aws_vpc" "default" {
-  cidr_block           = "${var.vpc_cidr_block}"
+  cidr_block           = var.vpc_cidr_block
   enable_dns_hostnames = true
 
-  tags {
-    Name = "terraform-aws-vpc"
-  }
+  # tags {
+  #   Name = "terraform-aws-vpc"
+  # }
 }
 
 ######################### Gateway ##############################
 resource "aws_internet_gateway" "default" {
-  vpc_id = "${aws_vpc.default.id}"
+  vpc_id = aws_vpc.default.id
 }
 
 ####################### Public subnet #########################
 resource "aws_subnet" "public-subnet" {
-  vpc_id                  = "${aws_vpc.default.id}"
-  cidr_block              = "${var.public_cidr_block1}"
+  vpc_id                  = aws_vpc.default.id
+  cidr_block              = var.public_cidr_block1
   map_public_ip_on_launch = true
-  depends_on              = ["aws_internet_gateway.default"]
-  availability_zone       = "${lookup(var.availability_zone,"primary")}"
+  availability_zone       = lookup(var.availability_zone, "primary")
 
-  tags {
-    Name = "My Public Subnet"
-  }
+  # tags {
+  #   Name = "My Public Subnet"
+  # }
 }
 
-resource "aws_route_table" "public-One-Route" {
-  vpc_id = "${aws_vpc.default.id}"
+resource "aws_route_table" "public-Route" {
+  vpc_id = aws_vpc.default.id
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = "${aws_internet_gateway.default.id}"
+    gateway_id = aws_internet_gateway.default.id
   }
 
-  tags {
-    Name = "Public Subnet One"
-  }
+  # tags {
+  #   Name = "Public Subnet One"
+  # }
 }
 
-resource "aws_route_table_association" "public-Assoc-One" {
-  subnet_id      = "${aws_subnet.public-One.id}"
-  route_table_id = "${aws_route_table.public-One-Route.id}"
+resource "aws_route_table_association" "public-Assoc" {
+  subnet_id      = aws_subnet.public-subnet.id
+  route_table_id = aws_route_table.public-Route.id
 }
 
 
